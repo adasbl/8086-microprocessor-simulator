@@ -34,7 +34,7 @@
             button_run_program = new Button();
             button_step_mode = new Button();
             label_AX = new Label();
-            txb_AX_reg = new TextBox();
+            txtb_AX_reg = new TextBox();
             txtb_BX_reg = new TextBox();
             label_BX = new Label();
             txtb_CX_reg = new TextBox();
@@ -45,6 +45,7 @@
             // 
             // program_display
             // 
+            program_display.Font = new Font("Segoe UI", 15F);
             program_display.Location = new Point(12, 12);
             program_display.Name = "program_display";
             program_display.Size = new Size(685, 455);
@@ -59,6 +60,7 @@
             button_save_program.TabIndex = 1;
             button_save_program.Text = "Zapisz";
             button_save_program.UseVisualStyleBackColor = true;
+            button_save_program.Click += button_save_program_Click;
             // 
             // button_load_program
             // 
@@ -68,6 +70,7 @@
             button_load_program.TabIndex = 2;
             button_load_program.Text = "Wczytaj";
             button_load_program.UseVisualStyleBackColor = true;
+            button_load_program.Click += button_load_program_Click;
             // 
             // button_run_program
             // 
@@ -77,6 +80,7 @@
             button_run_program.TabIndex = 3;
             button_run_program.Text = "Uruchom program";
             button_run_program.UseVisualStyleBackColor = true;
+            button_run_program.Click += button_run_program_Click;
             // 
             // button_step_mode
             // 
@@ -97,13 +101,14 @@
             label_AX.TabIndex = 5;
             label_AX.Text = "AX";
             // 
-            // txb_AX_reg
+            // txtb_AX_reg
             // 
-            txb_AX_reg.Font = new Font("Segoe UI", 18F);
-            txb_AX_reg.Location = new Point(816, 49);
-            txb_AX_reg.Name = "txb_AX_reg";
-            txb_AX_reg.Size = new Size(282, 47);
-            txb_AX_reg.TabIndex = 6;
+            txtb_AX_reg.Font = new Font("Segoe UI", 18F);
+            txtb_AX_reg.Location = new Point(816, 49);
+            txtb_AX_reg.Name = "txtb_AX_reg";
+            txtb_AX_reg.Size = new Size(282, 47);
+            txtb_AX_reg.TabIndex = 6;
+            txtb_AX_reg.Text = "0000000000000000";
             // 
             // txtb_BX_reg
             // 
@@ -112,6 +117,7 @@
             txtb_BX_reg.Name = "txtb_BX_reg";
             txtb_BX_reg.Size = new Size(282, 47);
             txtb_BX_reg.TabIndex = 8;
+            txtb_BX_reg.Text = "0000000000000000";
             // 
             // label_BX
             // 
@@ -130,6 +136,7 @@
             txtb_CX_reg.Name = "txtb_CX_reg";
             txtb_CX_reg.Size = new Size(282, 47);
             txtb_CX_reg.TabIndex = 10;
+            txtb_CX_reg.Text = "0000000000000000";
             // 
             // label_CX
             // 
@@ -148,6 +155,7 @@
             txtb_DX_reg.Name = "txtb_DX_reg";
             txtb_DX_reg.Size = new Size(282, 47);
             txtb_DX_reg.TabIndex = 12;
+            txtb_DX_reg.Text = "0000000000000000";
             // 
             // label_DX
             // 
@@ -163,14 +171,14 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1150, 627);
+            ClientSize = new Size(1150, 585);
             Controls.Add(txtb_DX_reg);
             Controls.Add(label_DX);
             Controls.Add(txtb_CX_reg);
             Controls.Add(label_CX);
             Controls.Add(txtb_BX_reg);
             Controls.Add(label_BX);
-            Controls.Add(txb_AX_reg);
+            Controls.Add(txtb_AX_reg);
             Controls.Add(label_AX);
             Controls.Add(button_step_mode);
             Controls.Add(button_run_program);
@@ -191,7 +199,7 @@
         private Button button_run_program;
         private Button button_step_mode;
         private Label label_AX;
-        private TextBox txb_AX_reg;
+        private TextBox txtb_AX_reg;
         private TextBox txtb_BX_reg;
         private Label label_BX;
         private TextBox txtb_CX_reg;
