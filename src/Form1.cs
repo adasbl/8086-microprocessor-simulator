@@ -1,5 +1,7 @@
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Xml.Serialization;
 
 namespace _8086_microprocessor_simulator
 {
@@ -14,9 +16,10 @@ namespace _8086_microprocessor_simulator
         private ushort B = 0;
         private ushort C = 0;
         private ushort D = 0;
+        private int curr_line = 0;
+        private string[] program_lines_step_work  = new string[0];
 
-        
-        private void MOV(ref ushort reg, char flag ,ushort value)
+        private void MOV(ref ushort reg, char flag, ushort value)
         {
             if (flag == 'X')
             {
@@ -62,12 +65,95 @@ namespace _8086_microprocessor_simulator
             }
         }
 
-        private void refresh_all_reg()
+        private void refreshAllReg()
         {
             txtb_AX_reg.Text = Convert.ToString(A, 2).PadLeft(16, '0');
             txtb_BX_reg.Text = Convert.ToString(B, 2).PadLeft(16, '0');
             txtb_CX_reg.Text = Convert.ToString(C, 2).PadLeft(16, '0');
             txtb_DX_reg.Text = Convert.ToString(D, 2).PadLeft(16, '0');
+        }
+        private ushort loadSourceValue(string source)
+        {
+            if (ushort.TryParse(source, out ushort value)) return value;
+
+            char reg = source[0];
+            char flag = source[1];
+
+            ushort full_value = 0;
+            switch (reg)
+            {
+                case 'A': full_value = A; break;
+                case 'B': full_value = B; break;
+                case 'C': full_value = C; break;
+                case 'D': full_value = D; break;
+            }
+
+            if (flag == 'H') return (ushort)(full_value >> 8);
+            if (flag == 'L') return (ushort)(full_value & 0xFF);
+
+            return full_value;
+        }
+        private void instructionExec(string code_line)
+        {
+            string[] parts = code_line.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 3)
+            {
+                string instruction = parts[0].ToUpper();
+                string register = parts[1].ToUpper();
+                string source = parts[2].ToUpper();
+
+                if (instruction == "MOV")
+                {
+                    ushort value = loadSourceValue(source);
+
+                    char reg = register[0];
+                    char flag = register[1];
+
+                    switch (reg)
+                    {
+                        case 'A': MOV(ref A, flag, value); break;
+                        case 'B': MOV(ref B, flag, value); break;
+                        case 'C': MOV(ref C, flag, value); break;
+                        case 'D': MOV(ref D, flag, value); break;
+                    }
+                }
+                else if (instruction == "ADD")
+                {
+                    ushort value = loadSourceValue(source);
+
+                    char reg = register[0];
+                    char flag = register[1];
+
+                    switch (reg)
+                    {
+                        case 'A': ADD(ref A, flag, value); break;
+                        case 'B': ADD(ref B, flag, value); break;
+                        case 'C': ADD(ref C, flag, value); break;
+                        case 'D': ADD(ref D, flag, value); break;
+                    }
+                }
+                else if (instruction == "SUB")
+                {
+                    ushort value = loadSourceValue(source);
+
+                    char reg = register[0];
+                    char flag = register[1];
+
+                    switch (reg)
+                    {
+                        case 'A': SUB(ref A, flag, value); break;
+                        case 'B': SUB(ref B, flag, value); break;
+                        case 'C': SUB(ref C, flag, value); break;
+                        case 'D': SUB(ref D, flag, value); break;
+                    }
+                }
+
+            }
+            else
+            {
+                MessageBox.Show($"Bład w skłądni. {code_line}");
+            }
         }
         private void button_save_program_Click(object sender, EventArgs e)
         {
@@ -117,9 +203,43 @@ namespace _8086_microprocessor_simulator
 
         private void button_run_program_Click(object sender, EventArgs e)
         {
-            ADD(ref A, 'H', 1);
-            ADD(ref B, 'L', 1);
-            refresh_all_reg();
+            string[] program_lines = program_display.Text
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .ToArray();
+
+            foreach (string line in program_lines)
+            {
+                instructionExec(line);
+            }
+            refreshAllReg();
+        }
+
+        private void button_step_mode_Click(object sender, EventArgs e)
+        {
+            if (curr_line == 0)
+            {
+                program_lines_step_work = program_display.Text
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Trim())
+                .ToArray();
+
+                instructionExec(program_lines_step_work[curr_line]);
+                refreshAllReg();
+                curr_line++;
+            }
+            else
+            {
+                
+                if (curr_line >= program_lines_step_work.Length) { 
+                curr_line = 0;
+                    return;
+                }
+
+                instructionExec(program_lines_step_work[curr_line]);
+                curr_line++;
+                refreshAllReg();
+            }
         }
     }
 }

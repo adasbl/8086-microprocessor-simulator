@@ -90,6 +90,7 @@
             button_step_mode.TabIndex = 4;
             button_step_mode.Text = "Praca krokowa";
             button_step_mode.UseVisualStyleBackColor = true;
+            button_step_mode.Click += button_step_mode_Click;
             // 
             // label_AX
             // 
