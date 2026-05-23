@@ -10,32 +10,64 @@ namespace _8086_microprocessor_simulator
             InitializeComponent();
         }
 
-        private ushort AX = 0;
-        private ushort BX = 0;
-        private ushort CX = 0;
-        private ushort DX = 0;
+        private ushort A = 0;
+        private ushort B = 0;
+        private ushort C = 0;
+        private ushort D = 0;
 
         
-        private void MOV(ref ushort reg, ushort value, [CallerArgumentExpression("reg")] string reg_name ="")
+        private void MOV(ref ushort reg, char flag ,ushort value)
         {
-            reg = (ushort)(value);
+            if (flag == 'X')
+            {
+                reg = (ushort)(value);
+            }
+            else if (flag == 'H')
+            {
+                reg = (ushort)((reg & 0x00FF) | (value << 8));
+            }
+            else if (flag == 'L')
+            {
+                reg = (ushort)((reg & 0xFF00) | (value & 0x00FF));
+            }
         }
-        private void ADD(ref ushort reg, ushort value)
+        private void ADD(ref ushort reg, char flag, ushort value)
         {
-            reg = (ushort)(reg + value);
+            if (flag == 'X')
+            {
+                reg = (ushort)(reg + value);
+            }
+            else if (flag == 'H')
+            {
+                reg = (ushort)((reg & 0x00FF) | (reg + (value << 8)));
+            }
+            else if (flag == 'L')
+            {
+                reg = (ushort)((reg & 0xFF00) | ((reg + value) & 0x00FF));
+            }
         }
-
-        private void SUB(ref ushort reg, ushort value)
+        private void SUB(ref ushort reg, char flag, ushort value)
         {
-            reg = (ushort)(reg - value);
+            if (flag == 'X')
+            {
+                reg = (ushort)(reg - value);
+            }
+            else if (flag == 'H')
+            {
+                reg = (ushort)((reg & 0x00FF) | (reg - (value << 8)));
+            }
+            else if (flag == 'L')
+            {
+                reg = (ushort)((reg & 0xFF00) | ((reg - value) & 0x00FF));
+            }
         }
 
         private void refresh_all_reg()
         {
-            txtb_AX_reg.Text = Convert.ToString(AX, 2).PadLeft(16, '0');
-            txtb_BX_reg.Text = Convert.ToString(BX, 2).PadLeft(16, '0');
-            txtb_CX_reg.Text = Convert.ToString(CX, 2).PadLeft(16, '0');
-            txtb_DX_reg.Text = Convert.ToString(DX, 2).PadLeft(16, '0');
+            txtb_AX_reg.Text = Convert.ToString(A, 2).PadLeft(16, '0');
+            txtb_BX_reg.Text = Convert.ToString(B, 2).PadLeft(16, '0');
+            txtb_CX_reg.Text = Convert.ToString(C, 2).PadLeft(16, '0');
+            txtb_DX_reg.Text = Convert.ToString(D, 2).PadLeft(16, '0');
         }
         private void button_save_program_Click(object sender, EventArgs e)
         {
@@ -85,8 +117,8 @@ namespace _8086_microprocessor_simulator
 
         private void button_run_program_Click(object sender, EventArgs e)
         {
-            ADD(ref AX, 16);
-            MOV(ref BX, AX);
+            ADD(ref A, 'H', 1);
+            ADD(ref B, 'L', 1);
             refresh_all_reg();
         }
     }
