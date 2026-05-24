@@ -41,6 +41,8 @@
             label_CX = new Label();
             txtb_DX_reg = new TextBox();
             label_DX = new Label();
+            textBox_curr_line = new TextBox();
+            label_curr_line = new Label();
             SuspendLayout();
             // 
             // program_display
@@ -90,6 +92,7 @@
             button_step_mode.TabIndex = 4;
             button_step_mode.Text = "Praca krokowa";
             button_step_mode.UseVisualStyleBackColor = true;
+            button_step_mode.Click += button_step_mode_Click;
             // 
             // label_AX
             // 
@@ -167,11 +170,31 @@
             label_DX.TabIndex = 11;
             label_DX.Text = "DX";
             // 
+            // textBox_curr_line
+            // 
+            textBox_curr_line.Font = new Font("Segoe UI", 19F);
+            textBox_curr_line.Location = new Point(912, 354);
+            textBox_curr_line.Name = "textBox_curr_line";
+            textBox_curr_line.Size = new Size(49, 50);
+            textBox_curr_line.TabIndex = 13;
+            // 
+            // label_curr_line
+            // 
+            label_curr_line.AutoSize = true;
+            label_curr_line.Font = new Font("Segoe UI", 15F);
+            label_curr_line.Location = new Point(825, 365);
+            label_curr_line.Name = "label_curr_line";
+            label_curr_line.Size = new Size(71, 35);
+            label_curr_line.TabIndex = 14;
+            label_curr_line.Text = "Krok:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1150, 585);
+            Controls.Add(label_curr_line);
+            Controls.Add(textBox_curr_line);
             Controls.Add(txtb_DX_reg);
             Controls.Add(label_DX);
             Controls.Add(txtb_CX_reg);
@@ -206,5 +229,7 @@
         private Label label_CX;
         private TextBox txtb_DX_reg;
         private Label label_DX;
+        private TextBox textBox_curr_line;
+        private Label label_curr_line;
     }
 }
