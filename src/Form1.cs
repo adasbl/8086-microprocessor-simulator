@@ -193,6 +193,7 @@ namespace _8086_microprocessor_simulator
                     string file_path = open_file_dialog.FileName;
                     string code = File.ReadAllText(file_path);
                     program_display.Text = code;
+                    curr_line = 0;
                 }
                 catch (Exception ex)
                 {
@@ -231,7 +232,7 @@ namespace _8086_microprocessor_simulator
                 return;
             }
 
-            textBox_curr_line.Text = curr_line.ToString();
+            textBox_curr_line.Text = (curr_line + 1) .ToString();
 
             instructionExec(program_lines_step_work[curr_line]);
             refreshAllReg();
