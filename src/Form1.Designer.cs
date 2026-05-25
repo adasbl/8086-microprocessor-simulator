@@ -43,12 +43,13 @@
             textBox_curr_line = new TextBox();
             label_curr_line = new Label();
             program_display = new RichTextBox();
+            button_clear_registers = new Button();
             SuspendLayout();
             // 
             // button_save_program
             // 
             button_save_program.Location = new Point(15, 591);
-            button_save_program.Margin = new Padding(4, 4, 4, 4);
+            button_save_program.Margin = new Padding(4);
             button_save_program.Name = "button_save_program";
             button_save_program.Size = new Size(200, 75);
             button_save_program.TabIndex = 1;
@@ -59,7 +60,7 @@
             // button_load_program
             // 
             button_load_program.Location = new Point(222, 591);
-            button_load_program.Margin = new Padding(4, 4, 4, 4);
+            button_load_program.Margin = new Padding(4);
             button_load_program.Name = "button_load_program";
             button_load_program.Size = new Size(200, 75);
             button_load_program.TabIndex = 2;
@@ -70,7 +71,7 @@
             // button_run_program
             // 
             button_run_program.Location = new Point(430, 591);
-            button_run_program.Margin = new Padding(4, 4, 4, 4);
+            button_run_program.Margin = new Padding(4);
             button_run_program.Name = "button_run_program";
             button_run_program.Size = new Size(200, 75);
             button_run_program.TabIndex = 3;
@@ -81,7 +82,7 @@
             // button_step_mode
             // 
             button_step_mode.Location = new Point(638, 591);
-            button_step_mode.Margin = new Padding(4, 4, 4, 4);
+            button_step_mode.Margin = new Padding(4);
             button_step_mode.Name = "button_step_mode";
             button_step_mode.Size = new Size(200, 75);
             button_step_mode.TabIndex = 4;
@@ -104,7 +105,7 @@
             // 
             txtb_AX_reg.Font = new Font("Segoe UI", 18F);
             txtb_AX_reg.Location = new Point(1020, 61);
-            txtb_AX_reg.Margin = new Padding(4, 4, 4, 4);
+            txtb_AX_reg.Margin = new Padding(4);
             txtb_AX_reg.Name = "txtb_AX_reg";
             txtb_AX_reg.Size = new Size(352, 55);
             txtb_AX_reg.TabIndex = 6;
@@ -114,7 +115,7 @@
             // 
             txtb_BX_reg.Font = new Font("Segoe UI", 18F);
             txtb_BX_reg.Location = new Point(1020, 128);
-            txtb_BX_reg.Margin = new Padding(4, 4, 4, 4);
+            txtb_BX_reg.Margin = new Padding(4);
             txtb_BX_reg.Name = "txtb_BX_reg";
             txtb_BX_reg.Size = new Size(352, 55);
             txtb_BX_reg.TabIndex = 8;
@@ -135,7 +136,7 @@
             // 
             txtb_CX_reg.Font = new Font("Segoe UI", 18F);
             txtb_CX_reg.Location = new Point(1020, 194);
-            txtb_CX_reg.Margin = new Padding(4, 4, 4, 4);
+            txtb_CX_reg.Margin = new Padding(4);
             txtb_CX_reg.Name = "txtb_CX_reg";
             txtb_CX_reg.Size = new Size(352, 55);
             txtb_CX_reg.TabIndex = 10;
@@ -156,7 +157,7 @@
             // 
             txtb_DX_reg.Font = new Font("Segoe UI", 18F);
             txtb_DX_reg.Location = new Point(1020, 260);
-            txtb_DX_reg.Margin = new Padding(4, 4, 4, 4);
+            txtb_DX_reg.Margin = new Padding(4);
             txtb_DX_reg.Name = "txtb_DX_reg";
             txtb_DX_reg.Size = new Size(352, 55);
             txtb_DX_reg.TabIndex = 12;
@@ -176,8 +177,8 @@
             // textBox_curr_line
             // 
             textBox_curr_line.Font = new Font("Segoe UI", 19F);
-            textBox_curr_line.Location = new Point(1140, 442);
-            textBox_curr_line.Margin = new Padding(4, 4, 4, 4);
+            textBox_curr_line.Location = new Point(1140, 500);
+            textBox_curr_line.Margin = new Padding(4);
             textBox_curr_line.Name = "textBox_curr_line";
             textBox_curr_line.Size = new Size(60, 58);
             textBox_curr_line.TabIndex = 13;
@@ -186,7 +187,7 @@
             // 
             label_curr_line.AutoSize = true;
             label_curr_line.Font = new Font("Segoe UI", 15F);
-            label_curr_line.Location = new Point(1031, 456);
+            label_curr_line.Location = new Point(1031, 510);
             label_curr_line.Margin = new Padding(4, 0, 4, 0);
             label_curr_line.Name = "label_curr_line";
             label_curr_line.Size = new Size(85, 41);
@@ -204,11 +205,23 @@
             program_display.TabIndex = 15;
             program_display.Text = "";
             // 
+            // button_clear_registers
+            // 
+            button_clear_registers.Location = new Point(1080, 351);
+            button_clear_registers.Margin = new Padding(4);
+            button_clear_registers.Name = "button_clear_registers";
+            button_clear_registers.Size = new Size(200, 75);
+            button_clear_registers.TabIndex = 16;
+            button_clear_registers.Text = "Wyczyść Rejestry";
+            button_clear_registers.UseVisualStyleBackColor = true;
+            button_clear_registers.Click += button_clear_registers_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1438, 731);
+            Controls.Add(button_clear_registers);
             Controls.Add(program_display);
             Controls.Add(label_curr_line);
             Controls.Add(textBox_curr_line);
@@ -224,7 +237,7 @@
             Controls.Add(button_run_program);
             Controls.Add(button_load_program);
             Controls.Add(button_save_program);
-            Margin = new Padding(4, 4, 4, 4);
+            Margin = new Padding(4);
             Name = "Form1";
             ResumeLayout(false);
             PerformLayout();
@@ -246,5 +259,6 @@
         private TextBox textBox_curr_line;
         private Label label_curr_line;
         private RichTextBox program_display;
+        private Button button_clear_registers;
     }
 }

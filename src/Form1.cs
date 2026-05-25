@@ -17,7 +17,7 @@ namespace _8086_microprocessor_simulator
         private ushort C = 0;
         private ushort D = 0;
         private int curr_line = 0;
-        private string[] program_lines_step_work  = new string[0];
+        private string[] program_lines_step_work = new string[0];
 
         private void MOV(ref ushort reg, char flag, ushort value)
         {
@@ -232,7 +232,7 @@ namespace _8086_microprocessor_simulator
                 return;
             }
 
-            textBox_curr_line.Text = (curr_line + 1) .ToString();
+            textBox_curr_line.Text = (curr_line + 1).ToString();
 
             highlight_current_line(curr_line);
 
@@ -255,6 +255,20 @@ namespace _8086_microprocessor_simulator
             program_display.SelectionBackColor = Color.Gray;
 
             program_display.DeselectAll();
+        }
+
+        private void reset_registers()
+        {
+            A = 0;
+            B = 0;
+            C = 0;
+            D = 0;
+            refreshAllReg();
+        }
+
+        private void button_clear_registers_Click(object sender, EventArgs e)
+        {
+            reset_registers();
         }
     }
 }
