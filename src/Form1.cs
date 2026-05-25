@@ -234,9 +234,27 @@ namespace _8086_microprocessor_simulator
 
             textBox_curr_line.Text = (curr_line + 1) .ToString();
 
+            highlight_current_line(curr_line);
+
             instructionExec(program_lines_step_work[curr_line]);
             refreshAllReg();
             curr_line++;
+        }
+
+        private void highlight_current_line(int lineIndex)
+        {
+            if (lineIndex < 0 || lineIndex >= program_display.Lines.Length) return;
+
+            program_display.SelectAll();
+            program_display.SelectionBackColor = program_display.BackColor;
+
+            int startIndex = program_display.GetFirstCharIndexFromLine(lineIndex);
+            int lineLength = program_display.Lines[lineIndex].Length;
+
+            program_display.Select(startIndex, lineLength);
+            program_display.SelectionBackColor = Color.Gray;
+
+            program_display.DeselectAll();
         }
     }
 }
