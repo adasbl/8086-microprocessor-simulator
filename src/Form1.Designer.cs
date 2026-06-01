@@ -44,11 +44,12 @@
             label_curr_line = new Label();
             program_display = new RichTextBox();
             button_clear_registers = new Button();
+            outputConsoleTextBox = new RichTextBox();
             SuspendLayout();
             // 
             // button_save_program
             // 
-            button_save_program.Location = new Point(15, 591);
+            button_save_program.Location = new Point(930, 480);
             button_save_program.Margin = new Padding(4);
             button_save_program.Name = "button_save_program";
             button_save_program.Size = new Size(200, 75);
@@ -59,7 +60,7 @@
             // 
             // button_load_program
             // 
-            button_load_program.Location = new Point(222, 591);
+            button_load_program.Location = new Point(1172, 480);
             button_load_program.Margin = new Padding(4);
             button_load_program.Name = "button_load_program";
             button_load_program.Size = new Size(200, 75);
@@ -70,7 +71,7 @@
             // 
             // button_run_program
             // 
-            button_run_program.Location = new Point(430, 591);
+            button_run_program.Location = new Point(930, 581);
             button_run_program.Margin = new Padding(4);
             button_run_program.Name = "button_run_program";
             button_run_program.Size = new Size(200, 75);
@@ -81,7 +82,7 @@
             // 
             // button_step_mode
             // 
-            button_step_mode.Location = new Point(638, 591);
+            button_step_mode.Location = new Point(1172, 581);
             button_step_mode.Margin = new Padding(4);
             button_step_mode.Name = "button_step_mode";
             button_step_mode.Size = new Size(200, 75);
@@ -177,7 +178,7 @@
             // textBox_curr_line
             // 
             textBox_curr_line.Font = new Font("Segoe UI", 19F);
-            textBox_curr_line.Location = new Point(1140, 500);
+            textBox_curr_line.Location = new Point(1073, 367);
             textBox_curr_line.Margin = new Padding(4);
             textBox_curr_line.Name = "textBox_curr_line";
             textBox_curr_line.Size = new Size(60, 58);
@@ -187,7 +188,7 @@
             // 
             label_curr_line.AutoSize = true;
             label_curr_line.Font = new Font("Segoe UI", 15F);
-            label_curr_line.Location = new Point(1031, 510);
+            label_curr_line.Location = new Point(964, 377);
             label_curr_line.Margin = new Padding(4, 0, 4, 0);
             label_curr_line.Name = "label_curr_line";
             label_curr_line.Size = new Size(85, 41);
@@ -201,26 +202,38 @@
             program_display.Location = new Point(15, 13);
             program_display.Margin = new Padding(4);
             program_display.Name = "program_display";
-            program_display.Size = new Size(855, 568);
+            program_display.Size = new Size(855, 472);
             program_display.TabIndex = 15;
             program_display.Text = "";
             // 
             // button_clear_registers
             // 
-            button_clear_registers.Location = new Point(1080, 351);
+            button_clear_registers.Location = new Point(1203, 335);
             button_clear_registers.Margin = new Padding(4);
             button_clear_registers.Name = "button_clear_registers";
-            button_clear_registers.Size = new Size(200, 75);
+            button_clear_registers.Size = new Size(169, 44);
             button_clear_registers.TabIndex = 16;
             button_clear_registers.Text = "Wyczyść Rejestry";
             button_clear_registers.UseVisualStyleBackColor = true;
             button_clear_registers.Click += button_clear_registers_Click;
+            // 
+            // outputConsoleTextBox
+            // 
+            outputConsoleTextBox.BackColor = SystemColors.MenuText;
+            outputConsoleTextBox.ForeColor = SystemColors.InactiveCaption;
+            outputConsoleTextBox.Location = new Point(15, 492);
+            outputConsoleTextBox.Name = "outputConsoleTextBox";
+            outputConsoleTextBox.ReadOnly = true;
+            outputConsoleTextBox.Size = new Size(855, 227);
+            outputConsoleTextBox.TabIndex = 17;
+            outputConsoleTextBox.Text = "";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1438, 731);
+            Controls.Add(outputConsoleTextBox);
             Controls.Add(button_clear_registers);
             Controls.Add(program_display);
             Controls.Add(label_curr_line);
@@ -260,5 +273,6 @@
         private Label label_curr_line;
         private RichTextBox program_display;
         private Button button_clear_registers;
+        private RichTextBox outputConsoleTextBox;
     }
 }

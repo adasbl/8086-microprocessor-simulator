@@ -19,6 +19,8 @@ namespace _8086_microprocessor_simulator
         private int curr_line = 0;
         private string[] program_lines_step_work = new string[0];
 
+        private bool isProgramTerminated = false;
+
         private Stack<ushort> cpu_stack = new Stack<ushort>();
         private void PushRegistersState()
         {
@@ -205,10 +207,7 @@ namespace _8086_microprocessor_simulator
                 else if (instruction == "INT")
                 {
                     string intNumberHex = target.Replace("H", "");
-
-                    PushRegistersState();
-
-                    PopRegistersState();
+                    handleInterrupt(intNumberHex);
                 }
                 else
                 {
@@ -269,6 +268,8 @@ namespace _8086_microprocessor_simulator
 
         private void button_run_program_Click(object sender, EventArgs e)
         {
+            isProgramTerminated = false;
+
             string[] program_lines = program_display.Text
                 .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Trim())
@@ -276,6 +277,7 @@ namespace _8086_microprocessor_simulator
 
             foreach (string line in program_lines)
             {
+                if (isProgramTerminated) break;
                 instructionExec(line);
             }
             refreshAllReg();
@@ -283,8 +285,15 @@ namespace _8086_microprocessor_simulator
 
         private void button_step_mode_Click(object sender, EventArgs e)
         {
+            if (isProgramTerminated)
+            {
+                MessageBox.Show("Program został zakończony. Zresetuj układ (zmień krok na 0), aby zacząć od nowa.");
+                return;
+            }
+
             if (curr_line == 0)
             {
+                isProgramTerminated = false;
                 program_lines_step_work = program_display.Text
                 .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => line.Trim())
@@ -335,6 +344,101 @@ namespace _8086_microprocessor_simulator
         private void button_clear_registers_Click(object sender, EventArgs e)
         {
             reset_registers();
+        }
+
+        private void handleInterrupt(string intNumberHex)
+        {
+            // Konwersja numeru przerwania (np. 21) z HEX na INT
+            if (!int.TryParse(intNumberHex, System.Globalization.NumberStyles.HexNumber, null, out int intNum))
+            {
+                MessageBox.Show($"Nieznany format przerwania: {intNumberHex}");
+                return;
+            }
+
+            // Wyciągnięcie wartości AH i AL z rejestru A (AX)
+            int ah = A >> 8;
+            int al = A & 0xFF;
+
+            switch (intNum)
+            {
+                case 0x21: // Przerwania DOS
+                    switch (ah)
+                    {
+                        case 0x02: // Wypisz pojedynczy znak z rejestru DL
+                            char charToPrint = (char)(D & 0xFF);
+                            outputConsoleTextBox.AppendText(charToPrint.ToString());
+                            break;
+
+                        case 0x09: // Wypisz ciąg znaków (symulacja wypisania rejestrów)
+                            outputConsoleTextBox.AppendText($"[DUMP] AX:{A:X4} BX:{B:X4} CX:{C:X4} DX:{D:X4}\n");
+                            break;
+
+                        case 0x2A: // Pobierz datę systemową
+                            DateTime date = DateTime.Now;
+                            C = (ushort)date.Year; // CX = rok
+                            D = (ushort)((date.Month << 8) | date.Day); // DH = miesiąc, DL = dzień
+                            break;
+
+                        case 0x2C: // Pobierz czas systemowy
+                            DateTime time = DateTime.Now;
+                            C = (ushort)((time.Hour << 8) | time.Minute); // CH = godzina, CL = minuta
+                            D = (ushort)((time.Second << 8) | 0); // DH = sekunda, DL = setne sekundy (dajemy 0 dla uproszczenia)
+                            break;
+
+                        case 0x4C: // Zakończ program
+                            isProgramTerminated = true;
+                            outputConsoleTextBox.AppendText("\n--- Program zakończony ---\n");
+                            break;
+                    }
+                    break;
+
+                case 0x1A: // Przerwania BIOS - Zegar RTC
+                    switch (ah)
+                    {
+                        case 0x00: // Odczytaj zegar (liczba "taktów" od północy)
+                                   // 1 takt to ok. 55ms. Dzielimy milisekundy przez 55.
+                            long ticks = (long)(DateTime.Now.TimeOfDay.TotalMilliseconds / 55.0);
+                            C = (ushort)((ticks >> 16) & 0xFFFF); // Starsze słowo do CX
+                            D = (ushort)(ticks & 0xFFFF);         // Młodsze słowo do DX
+                            break;
+
+                        case 0x04: // Odczytaj datę RTC z BIOSu
+                            DateTime rtcDate = DateTime.Now;
+                            C = (ushort)rtcDate.Year;
+                            D = (ushort)((rtcDate.Month << 8) | rtcDate.Day);
+                            break;
+                    }
+                    break;
+
+                case 0x10: // Przerwania BIOS - Monitor
+                    switch (ah)
+                    {
+                        case 0x00: // Zmiana trybu wideo (czyścimy ekran wyjściowy)
+                            outputConsoleTextBox.Clear();
+                            break;
+
+                        case 0x0E: // Wypisz znak z AL (TeleType output)
+                            char teleChar = (char)al;
+                            outputConsoleTextBox.AppendText(teleChar.ToString());
+                            break;
+                    }
+                    break;
+
+                case 0x16: // Przerwania BIOS - Klawiatura
+                    switch (ah)
+                    {
+                        case 0x01: // Sprawdź status bufora klawiatury
+                                   // W prostym symulatorze zakładamy brak wciśniętego klawisza.
+                                   // Ponieważ nie masz jeszcze rejestru FLAG (np. Zero Flag = 1), 
+                                   // nic nie zmieniamy w rejestrach jako symulację pustego bufora.
+                            break;
+                    }
+                    break;
+
+                default:
+                    MessageBox.Show($"Brak implementacji dla przerwania INT {intNumberHex}H");
+                    break;
+            }
         }
     }
 }
