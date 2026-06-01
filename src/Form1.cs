@@ -19,6 +19,25 @@ namespace _8086_microprocessor_simulator
         private int curr_line = 0;
         private string[] program_lines_step_work = new string[0];
 
+        private Stack<ushort> cpu_stack = new Stack<ushort>();
+        private void PushRegistersState()
+        {
+            cpu_stack.Push(A);
+            cpu_stack.Push(B);
+            cpu_stack.Push(C);
+            cpu_stack.Push(D);
+        }
+        private void PopRegistersState()
+        {
+            if (cpu_stack.Count >= 4)
+            {
+                D = cpu_stack.Pop();
+                C = cpu_stack.Pop();
+                B = cpu_stack.Pop();
+                A = cpu_stack.Pop();
+            }
+        }
+
         private void MOV(ref ushort reg, char flag, ushort value)
         {
             if (flag == 'X')
@@ -103,56 +122,68 @@ namespace _8086_microprocessor_simulator
                 string register = parts[1].ToUpper();
                 string source = parts[2].ToUpper();
 
+                ushort value = loadSourceValue(source);
+                char reg = register[0];
+                char flag = register[1];
+
                 if (instruction == "MOV")
                 {
-                    ushort value = loadSourceValue(source);
-
-                    char reg = register[0];
-                    char flag = register[1];
-
-                    switch (reg)
-                    {
-                        case 'A': MOV(ref A, flag, value); break;
-                        case 'B': MOV(ref B, flag, value); break;
-                        case 'C': MOV(ref C, flag, value); break;
-                        case 'D': MOV(ref D, flag, value); break;
-                    }
+                    switch (reg) { case 'A': MOV(ref A, flag, value); break; case 'B': MOV(ref B, flag, value); break; case 'C': MOV(ref C, flag, value); break; case 'D': MOV(ref D, flag, value); break; }
                 }
                 else if (instruction == "ADD")
                 {
-                    ushort value = loadSourceValue(source);
-
-                    char reg = register[0];
-                    char flag = register[1];
-
-                    switch (reg)
-                    {
-                        case 'A': ADD(ref A, flag, value); break;
-                        case 'B': ADD(ref B, flag, value); break;
-                        case 'C': ADD(ref C, flag, value); break;
-                        case 'D': ADD(ref D, flag, value); break;
-                    }
+                    switch (reg) { case 'A': ADD(ref A, flag, value); break; case 'B': ADD(ref B, flag, value); break; case 'C': ADD(ref C, flag, value); break; case 'D': ADD(ref D, flag, value); break; }
                 }
                 else if (instruction == "SUB")
                 {
-                    ushort value = loadSourceValue(source);
+                    switch (reg) { case 'A': SUB(ref A, flag, value); break; case 'B': SUB(ref B, flag, value); break; case 'C': SUB(ref C, flag, value); break; case 'D': SUB(ref D, flag, value); break; }
+                }
+                else
+                {
+                    MessageBox.Show($"Nieznana instrukcja 3-członowa: {code_line}");
+                }
+            }
+            else if (parts.Length == 2)
+            {
+                string instruction = parts[0].ToUpper();
+                string target = parts[1].ToUpper();
 
-                    char reg = register[0];
-                    char flag = register[1];
-
-                    switch (reg)
+                if (instruction == "PUSH")
+                {
+                    ushort value = loadSourceValue(target);
+                    cpu_stack.Push(value);
+                }
+                else if (instruction == "POP")
+                {
+                    if (cpu_stack.Count > 0)
                     {
-                        case 'A': SUB(ref A, flag, value); break;
-                        case 'B': SUB(ref B, flag, value); break;
-                        case 'C': SUB(ref C, flag, value); break;
-                        case 'D': SUB(ref D, flag, value); break;
+                        ushort value = cpu_stack.Pop();
+                        char reg = target[0];
+                        char flag = target[1];
+
+                        switch (reg) { case 'A': MOV(ref A, flag, value); break; case 'B': MOV(ref B, flag, value); break; case 'C': MOV(ref C, flag, value); break; case 'D': MOV(ref D, flag, value); break; }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Błąd: Stos jest pusty!");
                     }
                 }
+                else if (instruction == "INT")
+                {
+                    string intNumberHex = target.Replace("H", "");
 
+                    PushRegistersState();
+
+                    PopRegistersState();
+                }
+                else
+                {
+                    MessageBox.Show($"Nieznana instrukcja 2-członowa: {code_line}");
+                }
             }
             else
             {
-                MessageBox.Show($"Bład w skłądni. {code_line}");
+                MessageBox.Show($"Błąd w składni. {code_line}");
             }
         }
         private void button_save_program_Click(object sender, EventArgs e)
@@ -263,6 +294,7 @@ namespace _8086_microprocessor_simulator
             B = 0;
             C = 0;
             D = 0;
+            cpu_stack.Clear();
             refreshAllReg();
         }
 
