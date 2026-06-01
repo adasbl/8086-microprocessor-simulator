@@ -93,7 +93,37 @@ namespace _8086_microprocessor_simulator
         }
         private ushort loadSourceValue(string source)
         {
-            if (ushort.TryParse(source, out ushort value)) return value;
+            source = source.Trim().ToUpper();
+
+            try
+            {
+                if (source.EndsWith("H") && !source.All(char.IsLetter))
+                {
+                    return Convert.ToUInt16(source.TrimEnd('H'), 16);
+                }
+                else if (source.StartsWith("0X"))
+                {
+                    return Convert.ToUInt16(source.Substring(2), 16);
+                }
+                else if (source.EndsWith("B") && !source.All(char.IsLetter))
+                {
+                    return Convert.ToUInt16(source.TrimEnd('B'), 2);
+                }
+                else if (ushort.TryParse(source, out ushort decValue))
+                {
+                    return decValue;
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show($"Błąd formatu liczby: {source}", "Błąd składni");
+                return 0;
+            }
+            catch (OverflowException)
+            {
+                MessageBox.Show($"Wartość poza zakresem 16-bit (0-65535): {source}", "Błąd przepełnienia");
+                return 0;
+            }
 
             char reg = source[0];
             char flag = source[1];
@@ -105,10 +135,14 @@ namespace _8086_microprocessor_simulator
                 case 'B': full_value = B; break;
                 case 'C': full_value = C; break;
                 case 'D': full_value = D; break;
+                default:
+                    MessageBox.Show($"Nieznany rejestr: {source}", "Błąd");
+                    return 0;
             }
 
             if (flag == 'H') return (ushort)(full_value >> 8);
             if (flag == 'L') return (ushort)(full_value & 0xFF);
+            if (flag == 'X') return full_value;
 
             return full_value;
         }
