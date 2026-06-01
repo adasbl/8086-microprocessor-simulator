@@ -10,6 +10,7 @@ namespace _8086_microprocessor_simulator
         public Form1()
         {
             InitializeComponent();
+            InitializeInstructionDocumentation();
             InitializeInterruptDocumentation();
         }
 
@@ -50,6 +51,19 @@ namespace _8086_microprocessor_simulator
             public override string ToString()
             {
                 return Name;
+            }
+        }
+
+        public class InstructionDoc
+        {
+            public string Mnemonic { get; set; }
+            public string Syntax { get; set; }
+            public string Description { get; set; }
+            public string Example { get; set; }
+
+            public override string ToString()
+            {
+                return Mnemonic;
             }
         }
 
@@ -361,20 +375,18 @@ namespace _8086_microprocessor_simulator
 
         private void handleInterrupt(string intNumberHex)
         {
-            // Konwersja numeru przerwania (np. 21) z HEX na INT
             if (!int.TryParse(intNumberHex, System.Globalization.NumberStyles.HexNumber, null, out int intNum))
             {
                 MessageBox.Show($"Nieznany format przerwania: {intNumberHex}");
                 return;
             }
 
-            // Wyciągnięcie wartości AH i AL z rejestru A (AX)
             int ah = A >> 8;
             int al = A & 0xFF;
 
             switch (intNum)
             {
-                case 0x21: // Przerwania DOS
+                case 0x21:
                     switch (ah)
                     {
                         case 0x02: // Wypisz pojedynczy znak z rejestru DL
@@ -382,20 +394,20 @@ namespace _8086_microprocessor_simulator
                             outputConsoleTextBox.AppendText(charToPrint.ToString());
                             break;
 
-                        case 0x09: // Wypisz ciąg znaków (symulacja wypisania rejestrów)
+                        case 0x09: // Wypisz ciąg znaków
                             outputConsoleTextBox.AppendText($"[DUMP] AX:{A:X4} BX:{B:X4} CX:{C:X4} DX:{D:X4}\n");
                             break;
 
                         case 0x2A: // Pobierz datę systemową
                             DateTime date = DateTime.Now;
-                            C = (ushort)date.Year; // CX = rok
-                            D = (ushort)((date.Month << 8) | date.Day); // DH = miesiąc, DL = dzień
+                            C = (ushort)date.Year;
+                            D = (ushort)((date.Month << 8) | date.Day);
                             break;
 
                         case 0x2C: // Pobierz czas systemowy
                             DateTime time = DateTime.Now;
-                            C = (ushort)((time.Hour << 8) | time.Minute); // CH = godzina, CL = minuta
-                            D = (ushort)((time.Second << 8) | 0); // DH = sekunda, DL = setne sekundy (dajemy 0 dla uproszczenia)
+                            C = (ushort)((time.Hour << 8) | time.Minute);
+                            D = (ushort)((time.Second << 8) | 0);
                             break;
 
                         case 0x4C: // Zakończ program
@@ -408,14 +420,13 @@ namespace _8086_microprocessor_simulator
                 case 0x1A: // Przerwania BIOS - Zegar RTC
                     switch (ah)
                     {
-                        case 0x00: // Odczytaj zegar (liczba "taktów" od północy)
-                                   // 1 takt to ok. 55ms. Dzielimy milisekundy przez 55.
+                        case 0x00: 
                             long ticks = (long)(DateTime.Now.TimeOfDay.TotalMilliseconds / 55.0);
-                            C = (ushort)((ticks >> 16) & 0xFFFF); // Starsze słowo do CX
-                            D = (ushort)(ticks & 0xFFFF);         // Młodsze słowo do DX
+                            C = (ushort)((ticks >> 16) & 0xFFFF);
+                            D = (ushort)(ticks & 0xFFFF);
                             break;
 
-                        case 0x04: // Odczytaj datę RTC z BIOSu
+                        case 0x04:
                             DateTime rtcDate = DateTime.Now;
                             C = (ushort)rtcDate.Year;
                             D = (ushort)((rtcDate.Month << 8) | rtcDate.Day);
@@ -426,11 +437,11 @@ namespace _8086_microprocessor_simulator
                 case 0x10: // Przerwania BIOS - Monitor
                     switch (ah)
                     {
-                        case 0x00: // Zmiana trybu wideo (czyścimy ekran wyjściowy)
+                        case 0x00: 
                             outputConsoleTextBox.Clear();
                             break;
 
-                        case 0x0E: // Wypisz znak z AL (TeleType output)
+                        case 0x0E: 
                             char teleChar = (char)al;
                             outputConsoleTextBox.AppendText(teleChar.ToString());
                             break;
@@ -440,10 +451,7 @@ namespace _8086_microprocessor_simulator
                 case 0x16: // Przerwania BIOS - Klawiatura
                     switch (ah)
                     {
-                        case 0x01: // Sprawdź status bufora klawiatury
-                                   // W prostym symulatorze zakładamy brak wciśniętego klawisza.
-                                   // Ponieważ nie masz jeszcze rejestru FLAG (np. Zero Flag = 1), 
-                                   // nic nie zmieniamy w rejestrach jako symulację pustego bufora.
+                        case 0x01: 
                             break;
                     }
                     break;
@@ -555,6 +563,101 @@ namespace _8086_microprocessor_simulator
                     $"{selectedDoc.Returns}";
 
                 interruptsTextBox.Text = fullDescription;
+            }
+        }
+
+        private void InitializeInstructionDocumentation()
+        {
+            List<InstructionDoc> instructions = new List<InstructionDoc>
+    {
+        new InstructionDoc
+        {
+            Mnemonic = "MOV - Kopiowanie danych",
+            Syntax = "MOV rejestr, źródło",
+            Description = "Kopiuje wartość z elementu 'źródło' do elementu 'rejestr'.\n\n" +
+                          "Wspierane formaty źródła:\n" +
+                          "- Inny rejestr (np. AX, AH, AL, BX...)\n" +
+                          "- Liczba dziesiętna (np. 25)\n" +
+                          "- Liczba szesnastkowa (np. 10H lub 0X10)\n" +
+                          "- Liczba binarna (np. 1010B)",
+            Example = "MOV AX, 1234H  ; Wpisz 1234H do rejestru AX\n" +
+                      "MOV BL, AH     ; Skopiuj starszy bajt A do młodszego bajtu B"
+        },
+        new InstructionDoc
+        {
+            Mnemonic = "ADD - Dodawanie",
+            Syntax = "ADD rejestr, źródło",
+            Description = "Dodaje wartość 'źródło' do aktualnej wartości w 'rejestr' i zapisuje tam wynik (rejestr = rejestr + źródło).\n" +
+                          "Działa zarówno dla rejestrów pełnych 16-bitowych (X), jak i komórek 8-bitowych (H, L).",
+            Example = "MOV AX, 5      ; AX = 5\n" +
+                      "ADD AX, 10     ; AX = 15 (5 + 10)\n" +
+                      "ADD BH, AL     ; Dodaj wartość AL do BH"
+        },
+        new InstructionDoc
+        {
+            Mnemonic = "SUB - Odejmowanie",
+            Syntax = "SUB rejestr, źródło",
+            Description = "Odejmuje wartość 'źródło' od aktualnej wartości w 'rejestr' i zapisuje tam wynik (rejestr = rejestr - źródło).\n" +
+                          "W przypadku odejmowania większej liczby od mniejszej następuje naturalne przekręcenie licznika w standardzie 16-bitowym.",
+            Example = "MOV CX, 20     ; CX = 20\n" +
+                      "SUB CX, 5      ; CX = 15 (20 - 5)"
+        },
+        new InstructionDoc
+        {
+            Mnemonic = "PUSH - Odłożenie na stos",
+            Syntax = "PUSH źródło",
+            Description = "Wrzuca podaną wartość lub zawartość rejestru na wierzchołek wewnętrznego stosu procesora (cpu_stack).\n" +
+                          "Zwiększa rozmiar stosu. Pozwala na tymczasowe przechowanie danych.",
+            Example = "PUSH AX        ; Zapisz aktualny stan AX na stosie\n" +
+                      "PUSH 55H       ; Zapisz stałą wartość na stosie"
+        },
+        new InstructionDoc
+        {
+            Mnemonic = "POP - Pobranie ze stosu",
+            Syntax = "POP rejestr",
+            Description = "Zdejmuje wartość z samego wierzchołka stosu procesora i zapisuje ją do wskazanego rejestru.\n" +
+                          "Zmniejsza rozmiar stosu. Jeśli stos jest pusty, symulator zgłosi komunikat o błędzie.",
+            Example = "POP BX         ; Przywróć ostatnio zapisaną wartość ze stosu do rejestru BX"
+        },
+        new InstructionDoc
+        {
+            Mnemonic = "INT - Przerwanie programowe",
+            Syntax = "INT numerH",
+            Description = "Wywołuje procedurę przerwania sprzętowego lub systemowego o danym numerze (podawanym w HEX, litera H jest opcjonalna).\n" +
+                          "W tym symulatorze przed wykonaniem przerwania automatycznie zapamiętywany i odzyskiwany jest pełen stan rejestrów.\n\n" +
+                          "Dokładną listę funkcji sterowanych rejestrem AH znajdziesz w zakładce 'Dokumentacja Przerwań'.",
+            Example = "INT 21H        ; Wywołaj przerwanie DOS\n" +
+                      "INT 10         ; Wywołaj przerwanie ekranu BIOS"
+        }
+    };
+
+            listBox2.DataSource = instructions;
+        }
+
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox2.SelectedItem is InstructionDoc selectedInst)
+            {
+                assemblerTextBox.Clear();
+
+                string fullDescription =
+                    $"=== SPECYFIKACJA INSTRUKCJI ===\n" +
+                    $"{selectedInst.Mnemonic}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"SKŁADNIA (SYNTAX):\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedInst.Syntax}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"OPIS DZIAŁANIA W SYMULATORZE:\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedInst.Description}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"PRZYKŁAD UŻYCIA:\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedInst.Example}";
+
+                assemblerTextBox.Text = fullDescription;
             }
         }
     }

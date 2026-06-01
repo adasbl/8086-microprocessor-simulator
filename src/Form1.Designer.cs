@@ -47,11 +47,15 @@
             outputConsoleTextBox = new RichTextBox();
             tabControl = new TabControl();
             tabPage1 = new TabPage();
+            tabPage3 = new TabPage();
+            assemblerTextBox = new RichTextBox();
+            listBox2 = new ListBox();
             tabPage2 = new TabPage();
             interruptsTextBox = new RichTextBox();
             listBox1 = new ListBox();
             tabControl.SuspendLayout();
             tabPage1.SuspendLayout();
+            tabPage3.SuspendLayout();
             tabPage2.SuspendLayout();
             SuspendLayout();
             // 
@@ -239,6 +243,7 @@
             // tabControl
             // 
             tabControl.Controls.Add(tabPage1);
+            tabControl.Controls.Add(tabPage3);
             tabControl.Controls.Add(tabPage2);
             tabControl.Location = new Point(0, 0);
             tabControl.Name = "tabControl";
@@ -274,6 +279,35 @@
             tabPage1.Text = "SIMULATOR";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(assemblerTextBox);
+            tabPage3.Controls.Add(listBox2);
+            tabPage3.Location = new Point(4, 34);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(1430, 721);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Assembler documentation";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // assemblerTextBox
+            // 
+            assemblerTextBox.Location = new Point(493, 3);
+            assemblerTextBox.Name = "assemblerTextBox";
+            assemblerTextBox.ReadOnly = true;
+            assemblerTextBox.Size = new Size(929, 700);
+            assemblerTextBox.TabIndex = 2;
+            assemblerTextBox.Text = "";
+            // 
+            // listBox2
+            // 
+            listBox2.FormattingEnabled = true;
+            listBox2.Location = new Point(8, 0);
+            listBox2.Name = "listBox2";
+            listBox2.Size = new Size(479, 704);
+            listBox2.TabIndex = 1;
+            listBox2.SelectedIndexChanged += listBox2_SelectedIndexChanged;
+            // 
             // tabPage2
             // 
             tabPage2.Controls.Add(interruptsTextBox);
@@ -283,7 +317,7 @@
             tabPage2.Padding = new Padding(3);
             tabPage2.Size = new Size(1430, 721);
             tabPage2.TabIndex = 1;
-            tabPage2.Text = "Interrupts instructions";
+            tabPage2.Text = "Interrupts documentation";
             tabPage2.UseVisualStyleBackColor = true;
             // 
             // interruptsTextBox
@@ -315,6 +349,7 @@
             tabControl.ResumeLayout(false);
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
+            tabPage3.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -342,5 +377,8 @@
         private TabPage tabPage2;
         private RichTextBox interruptsTextBox;
         private ListBox listBox1;
+        private TabPage tabPage3;
+        private RichTextBox assemblerTextBox;
+        private ListBox listBox2;
     }
 }
