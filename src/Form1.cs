@@ -10,6 +10,7 @@ namespace _8086_microprocessor_simulator
         public Form1()
         {
             InitializeComponent();
+            InitializeInterruptDocumentation();
         }
 
         private ushort A = 0;
@@ -37,6 +38,18 @@ namespace _8086_microprocessor_simulator
                 C = cpu_stack.Pop();
                 B = cpu_stack.Pop();
                 A = cpu_stack.Pop();
+            }
+        }
+        public class InterruptDoc
+        {
+            public string Name { get; set; }
+            public string HowToInvoke { get; set; }
+            public string Parameters { get; set; }
+            public string Returns { get; set; }
+
+            public override string ToString()
+            {
+                return Name;
             }
         }
 
@@ -438,6 +451,110 @@ namespace _8086_microprocessor_simulator
                 default:
                     MessageBox.Show($"Brak implementacji dla przerwania INT {intNumberHex}H");
                     break;
+            }
+        }
+        private void InitializeInterruptDocumentation()
+        {
+            List<InterruptDoc> interrupts = new List<InterruptDoc>
+    {
+        new InterruptDoc
+        {
+            Name = "INT 21H, AH = 02h (DOS) - Wypisz znak",
+            HowToInvoke = "1. Wpisz 02H do rejestru AH.\n2. Wpisz kod ASCII znaku do rejestru DL.\n3. Wywołaj INT 21H.",
+            Parameters = "AH = 02h\nDL = Kod ASCII znaku, który ma zostać wyświetlony (np. 21H dla '!')",
+            Returns = "Brak (Znak pojawia się na konsoli wyjściowej)."
+        },
+        new InterruptDoc
+        {
+            Name = "INT 21H, AH = 09h (DOS) - Wypisz ciąg znaków",
+            HowToInvoke = "1. Wpisz 09H do rejestru AH.\n2. Wywołaj INT 21H.",
+            Parameters = "AH = 09h",
+            Returns = "Wypisuje aktualny stan wszystkich rejestrów (DUMP) tekstowo do konsoli."
+        },
+        new InterruptDoc
+        {
+            Name = "INT 21H, AH = 2Ah (DOS) - Pobierz datę",
+            HowToInvoke = "1. Wpisz 2AH do rejestru AH.\n2. Wywołaj INT 21H.",
+            Parameters = "AH = 2Ah",
+            Returns = "CX = Rok (w formacie dziesiętnym)\nDH = Miesiąc (1-12)\nDL = Dzień miesiąca (1-31)"
+        },
+        new InterruptDoc
+        {
+            Name = "INT 21H, AH = 2Ch (DOS) - Pobierz czas",
+            HowToInvoke = "1. Wpisz 2CH do rejestru AH.\n2. Wywołaj INT 21H.",
+            Parameters = "AH = 2Ch",
+            Returns = "CH = Godzina (0-23)\nCL = Minuta (0-59)\nDH = Sekunda (0-59)\nDL = Setne części sekundy (0)"
+        },
+        new InterruptDoc
+        {
+            Name = "INT 21H, AH = 4Ch (DOS) - Zakończ program",
+            HowToInvoke = "1. Wpisz 4CH do rejestru AH.\n2. Wywołaj INT 21H.",
+            Parameters = "AH = 4Ch",
+            Returns = "Zatrzymuje pętlę wykonawczą symulatora i wyświetla komunikat o zakończeniu."
+        },
+        new InterruptDoc
+        {
+            Name = "INT 1AH, AH = 00h (BIOS) - Odczytaj licznik czasu",
+            HowToInvoke = "1. Wpisz 00H do rejestru AH.\n2. Wywołaj INT 1AH.",
+            Parameters = "AH = 00h",
+            Returns = "Mierzy liczbę taktów (55ms) od północy:\nCX = Starsze 16 bitów licznika\nDX = Młodsze 16 bitów licznika"
+        },
+        new InterruptDoc
+        {
+            Name = "INT 1AH, AH = 04h (BIOS) - Odczytaj datę RTC",
+            HowToInvoke = "1. Wpisz 04H do rejestru AH.\n2. Wywołaj INT 1AH.",
+            Parameters = "AH = 04h",
+            Returns = "CX = Aktualny rok z zegara czasu rzeczywistego\nDH = Miesiąc\nDL = Dzień"
+        },
+        new InterruptDoc
+        {
+            Name = "INT 10H, AH = 00h (BIOS) - Zmiana trybu wideo",
+            HowToInvoke = "1. Wpisz 00H do rejestru AH.\n2. Wywołaj INT 10H.",
+            Parameters = "AH = 00h",
+            Returns = "W tym symulatorze czyści całkowicie okno konsoli wyjściowej (Reset)."
+        },
+        new InterruptDoc
+        {
+            Name = "INT 10H, AH = 0Eh (BIOS) - Teletype output",
+            HowToInvoke = "1. Wpisz 0EH do rejestru AH.\n2. Wpisz kod ASCII do rejestru AL.\n3. Wywołaj INT 10H.",
+            Parameters = "AH = 0Eh\nAL = Kod ASCII znaku do wypisania",
+            Returns = "Wypisuje znak z rejestru AL na ekranie konsoli i automatycznie przesuwa kursor."
+        },
+        new InterruptDoc
+        {
+            Name = "INT 16H, AH = 01h (BIOS) - Status klawiatury",
+            HowToInvoke = "1. Wpisz 01H do rejestru AH.\n2. Wywołaj INT 16H.",
+            Parameters = "AH = 01h",
+            Returns = "Sprawdza bufor klawiatury. Zwraca informację o braku wciśniętego klawisza (brak modyfikacji rejestrów)."
+        }
+    };
+
+            listBox1.DataSource = interrupts;
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem is InterruptDoc selectedDoc)
+            {
+                interruptsTextBox.Clear();
+
+                string fullDescription =
+                    $"=== DOKUMENTACJA FUNKCJI ===\n" +
+                    $"{selectedDoc.Name}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"JAK WYWOŁAĆ W KODZIE:\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedDoc.HowToInvoke}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"PARAMETRY WEJŚCIOWE (REJESTRY):\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedDoc.Parameters}\n\n" +
+                    $"--------------------------------------------------\n" +
+                    $"WARTOŚCI ZWRACANE:\n" +
+                    $"--------------------------------------------------\n" +
+                    $"{selectedDoc.Returns}";
+
+                interruptsTextBox.Text = fullDescription;
             }
         }
     }
